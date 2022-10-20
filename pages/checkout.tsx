@@ -1,6 +1,9 @@
-import { Fragment } from "react"
+import { Fragment, useCallback } from "react"
 import { ChevronRightIcon, ChevronUpIcon } from "@heroicons/react/20/solid"
 import { Popover, Transition } from "@headlessui/react"
+import { z } from "zod"
+import Form from "app/core/components/Form"
+import LabeledTextField from "app/core/components/LabeledTextField"
 
 const steps = [
   { name: "Cart", href: "#", status: "complete" },
@@ -33,7 +36,18 @@ const products = [
   // More products...
 ]
 
+export const Checkout = z.object({
+  cardNumber: z.string(),
+  cvc: z.string(),
+  nameOnCard: z.string(),
+  expiryDate: z.string().min(4).max(4),
+})
+
 export default function CheckoutPage() {
+  const onSumbit = useCallback(async ({ ...input }: z.infer<typeof Checkout>) => {
+    console.log(input)
+  }, [])
+
   return (
     <div className="bg-white">
       {/* Background color split screen for large screens */}
@@ -51,11 +65,7 @@ export default function CheckoutPage() {
           <div className="relative flex justify-end sm:justify-center">
             <a href="#" className="absolute left-0 top-1/2 -mt-4">
               <span className="sr-only">Super Company</span>
-              {/* <img
-                src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=600"
-                alt=""
-                className="h-8 w-auto"
-              /> */}
+
               <svg
                 width="170"
                 className="h-8 w-auto"
@@ -223,7 +233,11 @@ export default function CheckoutPage() {
           </div>
         </section>
 
-        <form className="px-4 pt-16 pb-36 sm:px-6 lg:col-start-1 lg:row-start-1 lg:px-0 lg:pb-16">
+        <Form
+          onSubmit={onSumbit}
+          initialValues={{ cardNumber: "", cvc: "", nameOnCard: "", expiryDate: "" }}
+          className="px-4 pt-16 pb-36 sm:px-6 lg:col-start-1 lg:row-start-1 lg:px-0 lg:pb-16"
+        >
           <div className="mx-auto max-w-lg lg:max-w-none">
             <section aria-labelledby="payment-heading" className="mt-10">
               <h2 id="payment-heading" className="text-lg font-medium text-gray-900">
@@ -232,66 +246,35 @@ export default function CheckoutPage() {
 
               <div className="mt-6 grid grid-cols-3 gap-y-6 gap-x-4 sm:grid-cols-4">
                 <div className="col-span-3 sm:col-span-4">
-                  <label htmlFor="name-on-card" className="block text-sm font-medium text-gray-700">
-                    Name on card
-                  </label>
-                  <div className="mt-1">
-                    <input
-                      type="text"
-                      id="name-on-card"
-                      name="name-on-card"
-                      autoComplete="cc-name"
-                      className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                    />
-                  </div>
+                  <LabeledTextField
+                    name="nameOnCard"
+                    label="Name on card"
+                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                  />
                 </div>
 
                 <div className="col-span-3 sm:col-span-4">
-                  <label htmlFor="card-number" className="block text-sm font-medium text-gray-700">
-                    Card number
-                  </label>
-                  <div className="mt-1">
-                    <input
-                      type="text"
-                      id="card-number"
-                      name="card-number"
-                      autoComplete="cc-number"
-                      className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                    />
-                  </div>
+                  <LabeledTextField
+                    name="cardNumber"
+                    label="Card number"
+                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                  />
                 </div>
 
                 <div className="col-span-2 sm:col-span-3">
-                  <label
-                    htmlFor="expiration-date"
-                    className="block text-sm font-medium text-gray-700"
-                  >
-                    Expiration date (MM/YY)
-                  </label>
-                  <div className="mt-1">
-                    <input
-                      type="text"
-                      name="expiration-date"
-                      id="expiration-date"
-                      autoComplete="cc-exp"
-                      className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                    />
-                  </div>
+                  <LabeledTextField
+                    name="expiryDate"
+                    label="Expiry Date"
+                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                  />
                 </div>
 
-                <div>
-                  <label htmlFor="cvc" className="block text-sm font-medium text-gray-700">
-                    CVC
-                  </label>
-                  <div className="mt-1">
-                    <input
-                      type="text"
-                      name="cvc"
-                      id="cvc"
-                      autoComplete="csc"
-                      className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                    />
-                  </div>
+                <div className="">
+                  <LabeledTextField
+                    name="cvc"
+                    label="CVC"
+                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                  />
                 </div>
               </div>
             </section>
@@ -308,7 +291,7 @@ export default function CheckoutPage() {
               </p>
             </div>
           </div>
-        </form>
+        </Form>
       </main>
     </div>
   )
