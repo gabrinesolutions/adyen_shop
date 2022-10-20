@@ -1,9 +1,10 @@
-import { Fragment, useCallback } from "react"
+import { Fragment, useCallback, useEffect } from "react"
 import { ChevronRightIcon, ChevronUpIcon } from "@heroicons/react/20/solid"
 import { Popover, Transition } from "@headlessui/react"
 import { z } from "zod"
 import Form from "app/core/components/Form"
 import LabeledTextField from "app/core/components/LabeledTextField"
+import axios from "axios"
 
 const steps = [
   { name: "Cart", href: "#", status: "complete" },
@@ -46,6 +47,20 @@ export const Checkout = z.object({
 export default function CheckoutPage() {
   const onSumbit = useCallback(async ({ ...input }: z.infer<typeof Checkout>) => {
     console.log(input)
+  }, [])
+
+  const getSession = async () => {
+    try {
+      const response = await axios.post("/api/sessions")
+
+      console.log(response.data)
+    } catch (error: any) {
+      console.error(error)
+    }
+  }
+
+  useEffect(() => {
+    void getSession()
   }, [])
 
   return (
